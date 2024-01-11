@@ -1,6 +1,7 @@
 ## Upute za korištenje
 <hr>
 Za pokretanje potrebno je preuzeti zip ili klonirati repozitorij s:
+
 ```
 git clone https://github.com/T30M47/PrakticniRad.git
 ```
