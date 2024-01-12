@@ -8,6 +8,9 @@ RUN chmod +x /usr/local/bin/wait-for-it
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install Faker
+RUN pip install faker-commerce
+
 
 COPY . .
 
