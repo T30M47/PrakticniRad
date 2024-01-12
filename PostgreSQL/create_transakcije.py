@@ -39,7 +39,7 @@ def create_fake_proizvodi():
         naziv_proizvoda = faker.ecommerce_name()
         cijena = round(random.uniform(10.00, 10000.00), 2)
         proizvodjac = generate_variation_of_company(faker.company())
-        kategorija = generate_product_category()
+        kategorija = faker.ecommerce_category()
 
         # Insert row
         insert_data_query = """
@@ -72,14 +72,38 @@ def generate_product_category():
     product_categories = ["Electronics", "Clothing", "Home and Garden", "Beauty", "Books", "Toys", "Sports", "Shoes"]
     return random.choice(product_categories)
 
+trgovine_nazivi = ["Konzum", "Super-Maxi Konzum", "Mini-Konzum", "MultiplusZum", "ExtraKonzum"]
+lokacije_nazivi = ["Zagreb", "Rijeka", "Osijek", "Rijeka", "Split"]
 
-create_Trgovine_table = """
-CREATE TABLE IF NOT EXISTS Trgovine (
-    id_trgovine INTEGER PRIMARY KEY,
-    naziv_trgovine VARCHAR(255) NOT NULL,
-    lokacija VARCHAR(255) NOT NULL
-);
-"""
+def create_fake_trgovine():
+    inserted_stores = set()
+
+    create_Trgovine_table = """
+    CREATE TABLE IF NOT EXISTS Trgovine (
+        id_trgovine INTEGER PRIMARY KEY,
+        naziv_trgovine VARCHAR(255) NOT NULL,
+        lokacija VARCHAR(255) NOT NULL
+    );
+    """
+    cursor.execute(create_Trgovine_table)
+    conn.commit()
+
+    # Generate fake data with different variations
+    for i in range(5):
+        id_trgovine = random.randint(10000, 99999)
+        inserted_stores.add(trgovine_nazivi[i])    
+        # Insert row
+        insert_data_query = """
+            INSERT INTO Trgovine (id_trgovine, naziv_trgovine, lokacija)
+            VALUES (%s, %s, %s);
+        """
+        cursor.execute(insert_data_query, (id_trgovine, trgovine_nazivi[i], lokacije_nazivi[i]))
+
+        if len(inserted_stores) == 3:
+                cursor.execute(insert_data_query, (random.randint(10000, 99999), trgovine_nazivi[i], lokacije_nazivi[i]))
+        
+    print("Data inserted in Trgovine!")
+    conn.commit()
 
 create_Transakcije_table = """
 CREATE TABLE IF NOT EXISTS Transakcije (
@@ -94,7 +118,7 @@ CREATE TABLE IF NOT EXISTS Transakcije (
 
 # Execute table creation queries
 create_fake_proizvodi()
-cursor.execute(create_Trgovine_table)
+create_fake_trgovine()
 cursor.execute(create_Transakcije_table)
 
 # Commit the changes and close the connection
