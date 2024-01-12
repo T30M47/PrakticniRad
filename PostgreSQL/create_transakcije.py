@@ -3,6 +3,7 @@ from psycopg2 import sql
 from faker import Faker
 import faker_commerce
 import random
+import datetime
 
 faker = Faker()
 faker.add_provider(faker_commerce.Provider)
@@ -35,7 +36,10 @@ def create_fake_proizvodi():
 
     # Generate fake data with different variations
     for _ in range(1000):
-        barkod_id = faker.ean(length = 8)
+        while True:
+            barkod_id = faker.ean(length = 8)
+            if barkod_id not in inserted_products:
+                break
         naziv_proizvoda = faker.ecommerce_name()
         cijena = round(random.uniform(10.00, 10000.00), 2)
         proizvodjac = generate_variation_of_company(faker.company())
@@ -46,7 +50,7 @@ def create_fake_proizvodi():
             INSERT INTO Proizvodi (barkod_id, naziv_proizvoda, cijena, proizvodjac, kategorija)
             VALUES (%s, %s, %s, %s, %s);
         """
-        inserted_products.add(naziv_proizvoda)
+        inserted_products.add(barkod_id)
         cursor.execute(insert_data_query, (barkod_id, naziv_proizvoda, cijena, proizvodjac, kategorija))
 
         if len(inserted_products) == 500 or len(inserted_products) == 600:
@@ -94,8 +98,11 @@ def create_fake_trgovine():
 
     # Generate fake data with different variations
     for i in range(5):
-        id_trgovine = random.randint(10000, 99999)
-        inserted_stores.add(trgovine_nazivi[i])    
+        while True:
+            id_trgovine = random.randint(10000, 99999)
+            if id_trgovine not in inserted_stores:
+                break
+        inserted_stores.add(id_trgovine)    
         # Insert row
         insert_data_query = """
             INSERT INTO Trgovine (id_trgovine, naziv_trgovine, lokacija)
@@ -120,11 +127,15 @@ def create_fake_transakcije():
         id_trgovine INTEGER REFERENCES Trgovine(id_trgovine),
         kolicina INTEGER NOT NULL,
         ukupna_cijena DOUBLE PRECISION NOT NULL,
+        datum_transakcije DATE NOT NULL,
         popust VARCHAR(5)
     );
     """
     cursor.execute(create_Transakcije_table)
     conn.commit()
+
+    start_date = datetime.date(2020, 1, 1)
+    end_date = datetime.date(2022, 12, 31)
 
     for _ in range(5000):
         while True:
@@ -135,17 +146,18 @@ def create_fake_transakcije():
         id_trgovine = get_random_id_trgovine()
         kolicina = random.randint(1, 10)
         ukupna_cijena = generate_random_price()
+        datum_transakcije = faker.date_between(start_date=start_date, end_date=end_date)
         popust = generate_random_popust()
         # Insert row
         insert_data_query = """
-            INSERT INTO Transakcije (id_transakcije, barkod_id, id_trgovine, kolicina, ukupna_cijena, popust)
-            VALUES (%s, %s, %s, %s, %s, %s);
+            INSERT INTO Transakcije (id_transakcije, barkod_id, id_trgovine, kolicina, ukupna_cijena, datum_transakcije, popust)
+            VALUES (%s, %s, %s, %s, %s, %s, %s);
         """
         inserted_transactions.add(id_transakcije)
-        cursor.execute(insert_data_query, (id_transakcije, barkod_id, id_trgovine, kolicina, ukupna_cijena, popust))
+        cursor.execute(insert_data_query, (id_transakcije, barkod_id, id_trgovine, kolicina, ukupna_cijena, datum_transakcije, popust))
 
         if len(inserted_transactions) == 500 or len(inserted_transactions) == 600:
-                      cursor.execute(insert_data_query, (random.randint(10000000, 99999999), barkod_id, id_trgovine, kolicina, ukupna_cijena, popust))
+                      cursor.execute(insert_data_query, (random.randint(10000000, 99999999), barkod_id, id_trgovine, kolicina, ukupna_cijena, datum_transakcije, popust))
 
     print("Data inserted in Transakcije!")
     conn.commit()
