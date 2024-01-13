@@ -19,6 +19,10 @@ conn = psycopg2.connect(
 # Create a cursor
 cursor = conn.cursor()
 
+
+# Kreiranje tablice Proizvodi:
+        # ubaceni duplikati
+        # uskladiti nazive kompanija (recimo da svi imaju nastavak Co., ili ako su dvije iste s Co. i jedna bez da se usklade)
 def create_fake_proizvodi():
     inserted_products = set()
     # Create tables
@@ -83,6 +87,8 @@ def generate_random_popust():
 trgovine_nazivi = ["Konzum", "Super-Maxi Konzum", "Mini-Konzum", "MultiplusZum", "ExtraKonzum"]
 lokacije_nazivi = ["Zagreb", "Rijeka", "Osijek", "Rijeka", "Split"]
 
+# Kreiranje tablice Trgovine:
+        # ubaceni duplikati
 def create_fake_trgovine():
     inserted_stores = set()
 
@@ -117,6 +123,10 @@ def create_fake_trgovine():
     conn.commit()
 
 
+# Kreiranje tablice Transakcije
+        # Ubaceni duplikati
+        # uskladiti cijene (da su sve recimo s dvije decimalne tocke)
+        # uskladiti popuste (da svi imaju ili nemaju znak za %)
 def create_fake_transakcije():
     inserted_transactions = set()
 
