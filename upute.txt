@@ -1,0 +1,53 @@
+docker exec -it 11303d0511d7 spark-submit   --master local[*]   --driver-class-path /app/postgresql-42.7.1.jar  /app/'Apache Spark'/spark_session.py
+
+docker exec -it 65454742f938 spark-submit   --master local[*]   --driver-class-path /app/postgresql-42.7.1.jar  /app/'Apache Spark'/spark_proizvodi.py
+docker exec -it 53a1f8d43309 spark-submit   --master local[*]   --driver-class-path /app/postgresql-42.7.1.jar  /app/'Apache Spark'/spark_trgovine.py
+docker exec -it 53a1f8d43309 spark-submit   --master local[*]   --driver-class-path /app/postgresql-42.7.1.jar  /app/'Apache Spark'/spark_vrijeme.py
+docker exec -it 53a1f8d43309 spark-submit   --master local[*]   --driver-class-path /app/postgresql-42.7.1.jar  /app/'Apache Spark'/spark_transakcije.py
+
+docker exec -it prakticnirad_postgres_1 psql -U postgres -d transakcije
+
+docker exec -it prakticnirad_postgres_2_1 psql -U postgres -d warehouse
+
+SELECT constraint_name, constraint_type
+FROM information_schema.table_constraints
+WHERE table_name = 'Proizvodi';
+
+
+docker system prune
+
+
+spark = SparkSession.builder \
+    .appName("OrphanedRecords") \
+    .getOrCreate()
+
+# Load Transakcije, Proizvodi, and Trgovine tables into Spark DataFrames
+transakcije_df = spark.read.jdbc(url=database_url, table="Transakcije", properties=database_properties)
+proizvodi_df = spark.read.jdbc(url=database_url, table="Proizvodi", properties=database_properties)
+trgovine_df = spark.read.jdbc(url=database_url, table="Trgovine", properties=database_properties)
+
+# Identify duplicated rows in Proizvodi and Trgovine
+valid_proizvod_id = proizvodi_df.groupBy("barkod_id").agg(F.first("barkod_id").alias("ValidProizvodiID"))
+valid_trgovina_id = trgovine_df.groupBy("id_trgovine").agg(F.first("id_trgovine").alias("ValidTrgovinaID"))
+
+# Identify valid values from the remaining rows
+#valid_proizvod_id = proizvodi_df.join(duplicated_proizvodi_df, "barkod_id", "left_anti").select("ProizvodID").first()["ProizvodID"]
+#valid_trgovina_id = trgovine_df.join(duplicated_trgovine_df, "id_trgovine", "left_anti").select("id_trgovine").first()["id_trgovine"]
+
+# Identify orphaned records
+orphaned_transakcije_df = transakcije_df.filter(~transakcije_df["barkod_id"].isin(proizvodi_df.select("barkod_id").rdd.flatMap(lambda x: x).collect()) |
+                                                 ~transakcije_df["id_trgovine"].isin(trgovine_df.select("id_trgovine").rdd.flatMap(lambda x: x).collect()))
+
+orphaned_transakcije_df = orphaned_transakcije_df.join(valid_proizvod_id, "barkod_id", "left").join(valid_trgovina_id, "id_trgovine", "left")
+
+# Show or save the updated orphaned records
+orphaned_transakcije_df.show()
+
+table_name = "Transakcije"
+
+df_transformed.write.jdbc(url=database_url, table=table_name, mode="overwrite", properties=database_properties)
+
+#df_transformed.write.jdbc(url=database_url, table=new_table_name, mode="overwrite", properties=database_properties)
+
+# Step 6: Execute ETL Job
+spark.stop()

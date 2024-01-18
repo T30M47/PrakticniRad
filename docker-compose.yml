@@ -2,13 +2,26 @@ version: '3'
 
 services:
   postgres:
-    image: postgres
+    image: postgres:latest
     environment:
       POSTGRES_DB: transakcije
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: Rea123Teo
     ports:
       - "5433:5432"
+    networks:
+      - mynetwork
+
+  postgres_2:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: warehouse
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Rea123Teo
+    ports:
+      - "5434:5432"
+    networks:
+      - mynetwork
 
   python_app:
     build:
@@ -17,3 +30,34 @@ services:
     working_dir: /app
     depends_on:
       - postgres
+      - postgres_2
+    networks:
+      - mynetwork
+    #environment:
+    #  - JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+
+  #pyspark_etl:
+    #build:
+      #context: .
+      #dockerfile: Dockerfile
+    #volumes:
+    #  - ./postgresql-42.7.1.jar:/app/postgresql-42.7.1.jar
+    #environment:
+    #  - JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+  
+  spark:
+    image: bitnami/spark:latest
+    build:
+      context: .
+      dockerfile: Dockerfile_pyspark
+    ports:
+      - "4040:4040"
+    volumes:
+      - ./postgresql-42.7.1.jar:/app/postgresql-42.7.1.jar
+      - ./:/app/
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
