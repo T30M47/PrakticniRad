@@ -1,3 +1,5 @@
+python Apache\ Spark/run_scripts.py 
+
 docker exec -it 11303d0511d7 spark-submit   --master local[*]   --driver-class-path /app/postgresql-42.7.1.jar  /app/'Apache Spark'/spark_session.py
 
 docker exec -it 65454742f938 spark-submit   --master local[*]   --driver-class-path /app/postgresql-42.7.1.jar  /app/'Apache Spark'/spark_proizvodi.py
@@ -5,13 +7,14 @@ docker exec -it 53a1f8d43309 spark-submit   --master local[*]   --driver-class-p
 docker exec -it 53a1f8d43309 spark-submit   --master local[*]   --driver-class-path /app/postgresql-42.7.1.jar  /app/'Apache Spark'/spark_vrijeme.py
 docker exec -it 53a1f8d43309 spark-submit   --master local[*]   --driver-class-path /app/postgresql-42.7.1.jar  /app/'Apache Spark'/spark_transakcije.py
 
-docker exec -it prakticnirad_postgres_1 psql -U postgres -d transakcije
+docker exec -it postgres_1 psql -U postgres -d transakcije
 
-docker exec -it prakticnirad_postgres_2_1 psql -U postgres -d warehouse
+docker exec -it postgres_2 psql -U postgres -d warehouse
 
 SELECT constraint_name, constraint_type
 FROM information_schema.table_constraints
 WHERE table_name = 'Proizvodi';
+
 
 
 docker system prune
