@@ -7,14 +7,14 @@ from pyspark.sql import functions as F
 
 # PostgreSQL connection details
 db_params = {
-    "host": "prakticnirad_postgres_2_1",
+    "host": "postgres_2",
     "port": 5432,
     "user": "postgres",
     "password": "Rea123Teo",
     "database": "warehouse"
 }
 
-warehouse_url = "jdbc:postgresql://prakticnirad_postgres_2_1:5432/warehouse"
+warehouse_url = "jdbc:postgresql://postgres_2:5432/warehouse"
 
 # Step 2: Configure PostgreSQL connection details
 database_properties = {

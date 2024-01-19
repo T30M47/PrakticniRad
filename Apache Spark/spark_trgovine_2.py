@@ -5,7 +5,7 @@ import psycopg2
 
 # PostgreSQL connection details
 db_params = {
-    "host": "prakticnirad_postgres_2_1",
+    "host": "postgres_2",
     "port": 5432,
     "user": "postgres",
     "password": "Rea123Teo",
@@ -49,7 +49,7 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 # Step 2: Configure PostgreSQL connection details
-database_url = "jdbc:postgresql://prakticnirad_postgres_1:5432/transakcije"
+database_url = "jdbc:postgresql://postgres_1:5432/transakcije"
 database_properties = {
     "user": "postgres",
     "password": "Rea123Teo",
@@ -69,7 +69,7 @@ df_transformed = df_transformed.select(
 )
 
 # Step 5: Write the transformed data to the new table in warehouse database
-warehouse_url = "jdbc:postgresql://prakticnirad_postgres_2_1:5432/warehouse"
+warehouse_url = "jdbc:postgresql://postgres_2:5432/warehouse"
 
 # Step 6: Update Transakcije table with new barkod_id
 transakcije_table_name = "Transakcije_proizvodi"

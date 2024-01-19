@@ -7,14 +7,14 @@ from pyspark.sql import functions as F
 
 # PostgreSQL connection details
 db_params = {
-    "host": "prakticnirad_postgres_2_1",
+    "host": "postgres_2",
     "port": 5432,
     "user": "postgres",
     "password": "Rea123Teo",
     "database": "warehouse"
 }
 
-warehouse_url = "jdbc:postgresql://prakticnirad_postgres_2_1:5432/warehouse"
+warehouse_url = "jdbc:postgresql://postgres_2:5432/warehouse"
 
 # Step 1: Create SparkSession
 spark = SparkSession.builder \
@@ -46,6 +46,7 @@ df_duplicates = df.dropDuplicates(subset=columns_to_check_duplicates)
 df_transformed = df.withColumn("ukupna_cijena", format_number(df["ukupna_cijena"], 2).cast("double"))
 df_transformed = df_transformed.withColumn("popust", regexp_replace("popust", "%", ""))
 df_transformed = df_transformed.withColumn("popust", df_transformed["popust"].cast("integer"))
+
 
 df_transformed = df_transformed.join(
     df_vrijeme,
@@ -103,7 +104,7 @@ columns_to_check_duplicates = [
 ]
 
 df_transformed = df_transformed.dropDuplicates(subset=columns_to_check_duplicates)
-
+df_transformed = df_transformed.na.fill(0, subset=["ukupna_cijena"])
 # Step 5: Write the transformed data to the new table in warehouse database
 df_transformed.write.jdbc(url=warehouse_url, table=new_table_name, mode="append", properties=database_properties)
 
