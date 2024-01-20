@@ -20,7 +20,7 @@ services:
       POSTGRES_PASSWORD: Rea123Teo
       POSTGRES_HOST_AUTH_METHOD: "scram-sha-256\nhost replication all 0.0.0.0/0 md5"
       POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
-      POSTGRES_SYNCHRONOUS_COMMIT: on
+      POSTGRES_SYNCHRONOUS_COMMIT: 'on'
     ports:
       - "5433:5432"
     networks:
@@ -43,7 +43,7 @@ services:
     environment:
       PGUSER: postgres
       PGPASSWORD: Rea123Teo
-      POSTGRES_SYNCHRONOUS_COMMIT: on 
+      POSTGRES_SYNCHRONOUS_COMMIT: 'on'
     ports:
       - "5435:5432"
     networks:
@@ -59,12 +59,12 @@ services:
       echo 'Backup done, starting replica...'
       chmod 0700 /var/lib/postgresql/data
       postgres
-      -c config_file=/etc/postgresql/postgresql.conf
+      # -c config_file=/etc/postgresql/postgresql.conf
       "
     depends_on:
       - postgres_1
     volumes:
-    - ./postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf:ro
 
   postgres_2:
     image: postgres:latest
