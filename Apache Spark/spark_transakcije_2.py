@@ -43,7 +43,7 @@ columns_to_check_duplicates = [
 ]
 
 df_duplicates = df.dropDuplicates(subset=columns_to_check_duplicates)
-df_transformed = df.withColumn("ukupna_cijena", format_number(df["ukupna_cijena"], 2).cast("double"))
+df_transformed = df.withColumn("ukupna_cijena", format_number(df["ukupna_cijena"], 2))
 df_transformed = df_transformed.withColumn("popust", regexp_replace("popust", "%", ""))
 df_transformed = df_transformed.withColumn("popust", df_transformed["popust"].cast("integer"))
 
@@ -80,7 +80,7 @@ create_table_sql = f"""
         id_trgovine INTEGER REFERENCES Trgovine(id_trgovine),
         id_vrijeme INTEGER REFERENCES Vrijeme(id_vrijeme),
         kolicina INTEGER NOT NULL,
-        ukupna_cijena DOUBLE PRECISION NOT NULL,
+        ukupna_cijena VARCHAR(10) NOT NULL,
         popust INTEGER NOT NULL
     )
 """
