@@ -30,7 +30,7 @@ COPY . .
 #ENV PATH $JAVA_HOME/bin:$PATH
 
 #CMD ["wait-for-it", "postgres:5432", "--", "python", "PostgreSQL/create_transakcije.py"]
-CMD ["wait-for-it", "postgres:5432", "--timeout=20", "--", "python", "PostgreSQL/create_transakcije.py"]
+CMD ["wait-for-it", "postgres_1:5432", "--timeout=20", "--", "python", "PostgreSQL/create_transakcije.py"]
 #CMD ["sh", "-c", "wait-for-it postgres:5432 -- python PostgreSQL/create_transakcije.py && python 'Apache Spark'/spark_session.py"]
 #CMD ["sh", "-c", "wait-for-it postgres:5432 -- python PostgreSQL/create_transakcije.py && /usr/bin/java -cp '/usr/local/lib/python3.8/site-packages/pyspark/jars/*' 'Apache Spark'/spark_session.py"]
 #CMD ["sh", "-c", "wait-for-it postgres:5432 -- python PostgreSQL/create_transakcije.py && python 'Apache Spark'/spark_session.py"]

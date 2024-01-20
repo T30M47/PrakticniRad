@@ -4,19 +4,34 @@ from faker import Faker
 import faker_commerce
 import random
 import datetime
+import time
 
 faker = Faker()
 faker.add_provider(faker_commerce.Provider)
 # Connect to PostgreSQL
-conn = psycopg2.connect(
-    host="postgres",
-    port=5432,
-    user="postgres",
-    password="Rea123Teo",
-    database="transakcije"
-)
+def connect_to_postgres():
+    max_retries = 30
+    retry_interval = 1  # seconds
+
+    for _ in range(max_retries):
+        try:
+            conn = psycopg2.connect(
+                host="postgres_1",
+                port=5432,
+                user="postgres",
+                password="Rea123Teo",
+                database="transakcije"
+            )
+            return conn
+        except psycopg2.OperationalError as e:
+            print(f"Error connecting to PostgreSQL: {e}")
+            print("Retrying...")
+            time.sleep(retry_interval)
+
+    raise Exception("Unable to connect to PostgreSQL")
 
 # Create a cursor
+conn = connect_to_postgres()
 cursor = conn.cursor()
 
 

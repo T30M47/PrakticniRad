@@ -1,17 +1,70 @@
 version: '3'
 
+x-postgres-common:
+  &postgres-common
+  image: postgres:latest
+  user: postgres
+  restart: always
+  healthcheck:
+    test: 'pg_isready -U postgres --dbname=transakcije'
+    interval: 10s
+    timeout: 5s
+    retries: 5
+
 services:
-  postgres:
-    image: postgres:latest
+  postgres_1:
+    <<: *postgres-common
     environment:
       POSTGRES_DB: transakcije
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: Rea123Teo
+      POSTGRES_HOST_AUTH_METHOD: "scram-sha-256\nhost replication all 0.0.0.0/0 md5"
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+      POSTGRES_SYNCHRONOUS_COMMIT: on
     ports:
       - "5433:5432"
     networks:
       - mynetwork
     container_name: postgres_1
+    command: |
+      postgres 
+      -c wal_level=replica 
+      -c hot_standby=on 
+      -c max_wal_senders=10 
+      -c max_replication_slots=10 
+      -c hot_standby_feedback=on
+      -c synchronous_commit=on
+    volumes:
+      - ./00_init.sql:/docker-entrypoint-initdb.d/00_init.sql
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf:ro 
+
+  postgres_1_slave:
+    <<: *postgres-common
+    environment:
+      PGUSER: postgres
+      PGPASSWORD: Rea123Teo
+      POSTGRES_SYNCHRONOUS_COMMIT: on 
+    ports:
+      - "5435:5432"
+    networks:
+      - mynetwork
+    container_name: postgres_1_slave
+    command: |
+      bash -c "
+      until pg_basebackup --pgdata=/var/lib/postgresql/data -R --slot=replication_slot --host=postgres_1 --port=5432
+      do
+      echo 'Waiting for primary to connect...'
+      sleep 1s
+      done
+      echo 'Backup done, starting replica...'
+      chmod 0700 /var/lib/postgresql/data
+      postgres
+      -c config_file=/etc/postgresql/postgresql.conf
+      "
+    depends_on:
+      - postgres_1
+    volumes:
+    - ./postgresql.conf:/etc/postgresql/postgresql.conf:ro
 
   postgres_2:
     image: postgres:latest
@@ -31,11 +84,13 @@ services:
       dockerfile: Dockerfile
     working_dir: /app
     depends_on:
-      - postgres
+      - postgres_1
+      - postgres_1_slave
       - postgres_2
     networks:
       - mynetwork
     container_name: python_app
+    
     #environment:
     #  - JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
 
