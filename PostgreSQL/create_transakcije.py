@@ -271,10 +271,18 @@ def create_fake_transakcije():
         ukupna_cijena DOUBLE PRECISION NOT NULL,
         datum_transakcije DATE NOT NULL,
         popust VARCHAR(5)
-    );
+    ) PARTITION BY RANGE (id_transakcije);
     """
     cursor.execute(create_Transakcije_table)
     conn.commit()
+
+    create_partition_queries = [
+        "CREATE TABLE Transakcije_part1 PARTITION OF Transakcije FOR VALUES FROM (MINVALUE) TO (5500000);",
+        "CREATE TABLE Transakcije_part2 PARTITION OF Transakcije FOR VALUES FROM (5500001) TO (MAXVALUE);",
+    ]
+    for query in create_partition_queries:
+        cursor.execute(query)
+        conn.commit()
 
     start_date = datetime.date(2020, 1, 1)
     end_date = datetime.date(2022, 12, 31)
@@ -318,7 +326,7 @@ def duplicate_tran():
         
         # Generate a new random ID that is not already in the database
         while True:
-            new_id = random.randint(100000, 999999)
+            new_id = random.randint(1000000, 9999999)
             cursor.execute("SELECT COUNT(*) FROM Transakcije WHERE id_transakcije = %s;", (new_id,))
             count = cursor.fetchone()[0]
             if count == 0:
