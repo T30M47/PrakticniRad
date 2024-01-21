@@ -13,5 +13,10 @@ cd ./PrakticniRad
 
 Zatim je potrebno pokrenuti naredbu:
 ```
-docker-compose up
+docker-compose up --build
+```
+
+Nakon što se sve pokrene, u novom terminalu je potrebno pokrenuti Python skriptu za izvođenje ETL procesa:
+```
+python '.\Apache Spark\run_scripts.py'
 ```
