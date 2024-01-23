@@ -118,6 +118,17 @@ services:
       - mynetwork
     container_name: spark
     
+  postgres_backup:
+    image: postgres:latest
+    volumes: 
+      - ./backups:/backups
+    depends_on: 
+      - postgres_2
+    networks:
+      - mynetwork
+    container_name: postgres_backup
+    command: ["sh", "-c", "while true; do PGPASSWORD=Rea123Teo pg_dump -h postgres_2 -U postgres -d warehouse -W -f /backups/backup_$(date +\\%Y\\%m\\%d_\\%H\\%M\\%S).sql; sleep 3600; done"]
+
 
 networks:
   mynetwork:
