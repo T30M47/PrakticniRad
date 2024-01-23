@@ -78,6 +78,18 @@ services:
       - mynetwork
     container_name: postgres_2
 
+  postgres_3:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: skladiste
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Rea123Teo
+    ports:
+      - "5436:5432"
+    networks:
+      - mynetwork
+    container_name: postgres_3
+
   python_app:
     build:
       context: .
@@ -87,21 +99,10 @@ services:
       - postgres_1
       - postgres_1_slave
       - postgres_2
+      - postgres_3
     networks:
       - mynetwork
     container_name: python_app
-    
-    #environment:
-    #  - JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
-
-  #pyspark_etl:
-    #build:
-      #context: .
-      #dockerfile: Dockerfile
-    #volumes:
-    #  - ./postgresql-42.7.1.jar:/app/postgresql-42.7.1.jar
-    #environment:
-    #  - JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
   
   spark:
     image: bitnami/spark:latest

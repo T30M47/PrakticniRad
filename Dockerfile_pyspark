@@ -2,6 +2,7 @@ FROM bitnami/spark:latest
 
 # Install psycopg2
 USER root
+RUN pip install Faker
 RUN apt-get update && \
     apt-get install -y python3-pip && \
     pip3 install psycopg2-binary

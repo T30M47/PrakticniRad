@@ -56,9 +56,6 @@ df_transformed = df_transformed.join(
     "left_outer"
 )
 
-#df_transformed = df_transformed.drop("datum_transakcije")
-df_transformed.show()
-
 # Select the relevant columns
 df_transformed = df_transformed.select("id_transakcije", "barkod_id", "id_trgovine", "id_vrijeme", "kolicina", "ukupna_cijena", "popust")
 
