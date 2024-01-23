@@ -12,6 +12,22 @@ db_params = {
     "database": "warehouse"
 }
 
+master_db_params = {
+    "host": "postgres_1",
+    "port": 5432,
+    "user": "postgres",
+    "password": "Rea123Teo",
+    "database": "transakcije"
+}
+
+slave_db_params = {
+    "host": "postgres_1_slave",
+    "port": 5432,
+    "user": "postgres",
+    "password": "Rea123Teo",
+    "database": "transakcije"
+}
+
 # Connect to PostgreSQL
 connection = psycopg2.connect(**db_params)
 cursor = connection.cursor()
@@ -84,7 +100,21 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 # Step 2: Configure PostgreSQL connection details
-database_url = "jdbc:postgresql://postgres_1:5432/transakcije"
+try:
+    # Try connecting to the master database
+    connection = psycopg2.connect(**master_db_params)
+    database_url = "jdbc:postgresql://postgres_1:5432/transakcije"
+except Exception as e:
+    print(f"Failed to connect to the master database: {e}")
+    print("Trying to connect to the slave database...")
+
+    try:
+        # Try connecting to the slave database
+        connection = psycopg2.connect(**slave_db_params)
+        database_url = "jdbc:postgresql://postgres_1_slave:5432/transakcije"
+    except Exception as e:
+        print(f"Failed to connect to the slave database: {e}")
+        raise
 database_properties = {
     "user": "postgres",
     "password": "Rea123Teo",
