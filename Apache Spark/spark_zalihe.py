@@ -326,14 +326,14 @@ columns_to_delete = ["barkod_id", "id_skladista"]
     sql.SQL(', ').join(sql.Identifier(column) for column in columns_to_delete)
 )"""
 
-columns_str = ", ".join(columns_to_delete)
-sql_query = f"ALTER TABLE {table_name} DROP COLUMN {columns_str};"
+for column in columns_to_delete:
+    sql_query = f"ALTER TABLE {table_name} DROP COLUMN {column};"
 
-# Execute the SQL statement
-cursor.execute(sql_query)
+    # Execute the SQL statement
+    cursor.execute(sql_query)
 
-# Commit the changes to the database
-connection.commit()
+    # Commit the changes to the database
+    connection.commit()
 
 # Close the cursor and connection
 cursor.close()
