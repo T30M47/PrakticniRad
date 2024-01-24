@@ -2,6 +2,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, unix_timestamp, from_unixtime, when, to_date
 from pyspark.sql.types import DateType
 import psycopg2
+from psycopg2 import sql
 
 # PostgreSQL connection details
 db_params_skladiste = {
@@ -314,6 +315,24 @@ rename_table_sql = f"ALTER TABLE {current_table_name} RENAME TO {new_table_name}
 cursor.execute(rename_table_sql)
 
 # Commit the changes
+connection.commit()
+
+table_name = "Zalihe"
+columns_to_delete = ["barkod_id", "id_skladista"]
+
+# Generate the SQL statement to delete columns
+"""alter_table_query = sql.SQL("ALTER TABLE {} DROP COLUMN {}").format(
+    sql.Identifier(table_name),
+    sql.SQL(', ').join(sql.Identifier(column) for column in columns_to_delete)
+)"""
+
+columns_str = ", ".join(columns_to_delete)
+sql_query = f"ALTER TABLE {table_name} DROP COLUMN {columns_str};"
+
+# Execute the SQL statement
+cursor.execute(sql_query)
+
+# Commit the changes to the database
 connection.commit()
 
 # Close the cursor and connection
