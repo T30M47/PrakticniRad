@@ -245,11 +245,11 @@ joined_df = zalihe_df.join(
     transakcije_df,
     (zalihe_df["barkod_id"] == transakcije_df["barkod_id"]) &
     (zalihe_df["id_skladista"] == transakcije_df["id_skladista"]),
-    "inner"
+    "right"
 )
 
 # Select only the desired columns
-result_df = joined_df.select("id_transakcije", transakcije_df["barkod_id"], "id_trgovine", "id_vrijeme", transakcije_df["id_skladista"], zalihe_df["id_zalihe"], "kolicina", "ukupna_cijena", "popust")
+result_df = joined_df.select("id_transakcije", transakcije_df["barkod_id"], "id_trgovine", "id_vrijeme", "Month", transakcije_df["id_skladista"], zalihe_df["id_zalihe"], "kolicina", "ukupna_cijena", "popust")
 
 connection = psycopg2.connect(**db_params_warehouse)
 cursor = connection.cursor()
@@ -264,12 +264,15 @@ create_table_sql = f"""
         id_transakcije INTEGER PRIMARY KEY,
         barkod_id INTEGER REFERENCES Proizvodi(barkod_id),
         id_trgovine INTEGER REFERENCES Trgovine(id_trgovine),
-        id_vrijeme INTEGER REFERENCES Vrijeme(id_vrijeme),
+        id_vrijeme INTEGER,
+        Month INTEGER,
         id_skladista INTEGER REFERENCES Skladista(id_skladista),
         id_zalihe INTEGER REFERENCES Zalihe(id_zalihe),
         kolicina INTEGER NOT NULL,
         ukupna_cijena VARCHAR(10) NOT NULL,
-        popust INTEGER NOT NULL
+        popust INTEGER NOT NULL,
+        CONSTRAINT fk_vrijeme
+        FOREIGN KEY (id_vrijeme, Month) REFERENCES Vrijeme (id_vrijeme, Month)
     )
 """
 

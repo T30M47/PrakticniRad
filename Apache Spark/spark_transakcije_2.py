@@ -57,7 +57,7 @@ df_transformed = df_transformed.join(
 )
 
 # Select the relevant columns
-df_transformed = df_transformed.select("id_transakcije", "barkod_id", "id_trgovine", "id_vrijeme", "kolicina", "ukupna_cijena", "popust")
+df_transformed = df_transformed.select("id_transakcije", "barkod_id", "id_trgovine", "id_vrijeme", "Month", "kolicina", "ukupna_cijena", "popust")
 
 # Connect to PostgreSQL
 connection = psycopg2.connect(**db_params)
@@ -75,10 +75,13 @@ create_table_sql = f"""
         id_transakcije INTEGER PRIMARY KEY,
         barkod_id INTEGER REFERENCES Proizvodi(barkod_id),
         id_trgovine INTEGER REFERENCES Trgovine(id_trgovine),
-        id_vrijeme INTEGER REFERENCES Vrijeme(id_vrijeme),
+        id_vrijeme INTEGER,
+        Month INTEGER,
         kolicina INTEGER NOT NULL,
         ukupna_cijena VARCHAR(10) NOT NULL,
-        popust INTEGER NOT NULL
+        popust INTEGER NOT NULL,
+        CONSTRAINT fk_vrijeme
+        FOREIGN KEY (id_vrijeme, Month) REFERENCES Vrijeme (id_vrijeme, Month)
     )
 """
 

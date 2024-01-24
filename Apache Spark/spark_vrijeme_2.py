@@ -57,16 +57,27 @@ connection.commit()
 
 create_table_sql = f"""
     CREATE TABLE {table_name} (
-        id_vrijeme INTEGER PRIMARY KEY,
+        id_vrijeme INTEGER NOT NULL,
         Year INTEGER,
-        Month INTEGER,
+        Month INTEGER NOT NULL,
         Day INTEGER,
         DayOfWeek INTEGER
     )
+    PARTITION BY LIST (Month);
 """
 
 # Execute the SQL statement to create the new table
 cursor.execute(create_table_sql)
+
+connection.commit()
+
+create_partition_query = """
+CREATE TABLE Vrijeme_partition_1 PARTITION OF Vrijeme FOR VALUES IN (1, 2, 3, 4);
+CREATE TABLE Vrijeme_partition_2 PARTITION OF Vrijeme FOR VALUES IN (5, 6, 7, 8);
+CREATE TABLE Vrijeme_partition_3 PARTITION OF Vrijeme FOR VALUES IN (9, 10, 11, 12);
+"""
+
+cursor.execute(create_partition_query)
 
 # Commit the changes
 connection.commit()
@@ -81,3 +92,21 @@ df_export.write.jdbc(url=warehouse_url, table=table_name, mode="append", propert
 # Stop the Spark session
 spark.stop()
 
+
+connection = psycopg2.connect(**db_params)
+cursor = connection.cursor()
+
+sql_query = f"""
+    ALTER TABLE Vrijeme ADD CONSTRAINT unique_sve UNIQUE (id_vrijeme, Month);
+"""
+
+# Execute the SQL statement to create the new table
+cursor.execute(sql_query)
+
+
+# Commit the changes
+connection.commit()
+
+# Close the cursor and connection
+cursor.close()
+connection.close()

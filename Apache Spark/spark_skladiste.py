@@ -1,4 +1,5 @@
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
 import psycopg2
 
 # PostgreSQL connection details
@@ -81,7 +82,7 @@ df_trgovine.createOrReplaceTempView("trgovine")
 result = df_transakcije \
     .join(df_trgovine, df_transakcije["id_trgovine"] == df_trgovine["id_trgovine"]) \
     .join(df_skladiste, df_trgovine["lokacija"] == df_skladiste["lokacija"]) \
-    .select(df_transakcije["*"], df_skladiste["id_skladista"].alias("id_skladista"))
+    .select(df_transakcije["id_transakcije"], df_transakcije["barkod_id"], df_transakcije["id_trgovine"], df_transakcije["id_vrijeme"], df_transakcije["Month"], df_skladiste["id_skladista"].alias("id_skladista"), df_transakcije["kolicina"], df_transakcije["ukupna_cijena"], df_transakcije["popust"])
 
 connection = psycopg2.connect(**db_params_warehouse)
 cursor = connection.cursor()
@@ -96,11 +97,14 @@ create_table_sql = f"""
         id_transakcije INTEGER PRIMARY KEY,
         barkod_id INTEGER REFERENCES Proizvodi(barkod_id),
         id_trgovine INTEGER REFERENCES Trgovine(id_trgovine),
-        id_vrijeme INTEGER REFERENCES Vrijeme(id_vrijeme),
+        id_vrijeme INTEGER,
+        Month INTEGER,
+        id_skladista INTEGER REFERENCES Skladista(id_skladista),
         kolicina INTEGER NOT NULL,
         ukupna_cijena VARCHAR(10) NOT NULL,
         popust INTEGER NOT NULL,
-        id_skladista INTEGER REFERENCES Skladista(id_skladista)
+        CONSTRAINT fk_vrijeme
+        FOREIGN KEY (id_vrijeme, Month) REFERENCES Vrijeme (id_vrijeme, Month)
     )
 """
 
