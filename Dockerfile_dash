@@ -4,5 +4,5 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install dash pandas psycopg2-binary
+RUN pip install dash pandas psycopg2-binary dash-bootstrap-components
 
