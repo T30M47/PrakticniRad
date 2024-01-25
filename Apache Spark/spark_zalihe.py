@@ -237,7 +237,28 @@ database_properties = {
 # Step 3: Load data from PostgreSQL
 table_name = "Zalihe"
 zalihe_df = spark.read.jdbc(url=database_url_warehouse, table=table_name, properties=database_properties)
-table_name = "Transakcije"
+
+connection = psycopg2.connect(**db_params_warehouse)
+cursor = connection.cursor()
+
+# Define the current and new table names
+current_table_name = "Transakcije"
+new_table_name = "Transakcije_new"
+
+# SQL command to rename the table
+rename_table_sql = f"ALTER TABLE {current_table_name} RENAME TO {new_table_name};"
+
+# Execute the SQL statement to rename the table
+cursor.execute(rename_table_sql)
+
+# Commit the changes
+connection.commit()
+
+# Close the cursor and connection
+cursor.close()
+connection.close()
+
+table_name = "Transakcije_new"
 transakcije_df = spark.read.jdbc(url=database_url_warehouse, table=table_name, properties=database_properties)
 
 # Join the DataFrames on common columns
@@ -255,12 +276,12 @@ connection = psycopg2.connect(**db_params_warehouse)
 cursor = connection.cursor()
 
 # Drop the existing table
-drop_table_sql = "DROP TABLE IF EXISTS Transakcije_new;"
+drop_table_sql = "DROP TABLE IF EXISTS Transakcije;"
 cursor.execute(drop_table_sql)
 connection.commit()
 
 create_table_sql = f"""
-    CREATE TABLE Transakcije_new (
+    CREATE TABLE Transakcije (
         id_transakcije INTEGER PRIMARY KEY,
         barkod_id INTEGER REFERENCES Proizvodi(barkod_id),
         id_trgovine INTEGER REFERENCES Trgovine(id_trgovine),
@@ -273,7 +294,7 @@ create_table_sql = f"""
         popust INTEGER NOT NULL,
         CONSTRAINT fk_vrijeme
         FOREIGN KEY (id_vrijeme, Month) REFERENCES Vrijeme (id_vrijeme, Month)
-    )
+    ) PARTITION BY RANGE (id_transakcije);
 """
 
 # Execute the SQL statement to create the new table
@@ -282,11 +303,21 @@ cursor.execute(create_table_sql)
 # Commit the changes
 connection.commit()
 
+create_partition_query = """
+    CREATE TABLE Transakcije_part1 PARTITION OF Transakcije FOR VALUES FROM (MINVALUE) TO (5500000);
+    CREATE TABLE Transakcije_part2 PARTITION OF Transakcije FOR VALUES FROM (5500001) TO (MAXVALUE);
+"""
+
+cursor.execute(create_partition_query)
+
+# Commit the changes
+connection.commit()
+
 # Close the cursor and connection
 cursor.close()
 connection.close()
 
-result_df.write.jdbc(url=warehouse_url, table="Transakcije_new", mode="overwrite", properties=database_properties)
+result_df.write.jdbc(url=warehouse_url, table="Transakcije", mode="append", properties=database_properties)
 
 # Stop the Spark session
 spark.stop()
@@ -296,26 +327,13 @@ connection = psycopg2.connect(**db_params_warehouse)
 cursor = connection.cursor()
 
 # Define the table name to be deleted
-table_name_to_delete = "Transakcije"
+table_name_to_delete = "Transakcije_new"
 
 # SQL command to drop the table if it exists
 drop_table_sql = f"DROP TABLE IF EXISTS {table_name_to_delete};"
 
 # Execute the SQL statement to drop the table
 cursor.execute(drop_table_sql)
-
-# Commit the changes
-connection.commit()
-
-# Define the current and new table names
-current_table_name = "Transakcije_new"
-new_table_name = "Transakcije"
-
-# SQL command to rename the table
-rename_table_sql = f"ALTER TABLE {current_table_name} RENAME TO {new_table_name};"
-
-# Execute the SQL statement to rename the table
-cursor.execute(rename_table_sql)
 
 # Commit the changes
 connection.commit()
