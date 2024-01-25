@@ -11,7 +11,8 @@ commands = [
     ["docker", "exec", container_name, "spark-submit", "--master", "local[*]", "--driver-class-path", "/app/postgresql-42.7.1.jar", "/app/Apache Spark/spark_transakcije_2.py"],
     ["docker", "exec", container_name, "spark-submit", "--master", "local[*]", "--driver-class-path", "/app/postgresql-42.7.1.jar", "/app/Skladiste/create_skladiste.py"],
     ["docker", "exec", container_name, "spark-submit", "--master", "local[*]", "--driver-class-path", "/app/postgresql-42.7.1.jar", "/app/Apache Spark/spark_skladiste.py"],
-    ["docker", "exec", container_name, "spark-submit", "--master", "local[*]", "--driver-class-path", "/app/postgresql-42.7.1.jar", "/app/Apache Spark/spark_zalihe.py"]
+    ["docker", "exec", container_name, "spark-submit", "--master", "local[*]", "--driver-class-path", "/app/postgresql-42.7.1.jar", "/app/Apache Spark/spark_zalihe.py"],
+    ["docker", "exec", "dash_web_app", "python", "Dash/app.py"]
 ]
 
 # Run the commands sequentially
