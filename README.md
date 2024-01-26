@@ -34,3 +34,20 @@ http://localhost:8050
 ```
 
 Ako želite isprobati dodatne upite nad skladištem, upute su dane u datoteci upute.txt.
+
+## Upute za probleme
+
+Ako Vam i nakon pokretanja skkripti javlja pogrešku da nema psycopg2 paketa, potrebno je osigurati da je on instaliran pa možete ponoviti naredbu:
+```
+pip install psycopg2-binary
+```
+
+Zatim je potrebno ugasiti kontejnere s:
+```
+docker-compose down
+```
+
+Zatim je potrebno ponovno nanovo pokrenuti kontejnere s:
+```
+docker-compose up --build
+```
