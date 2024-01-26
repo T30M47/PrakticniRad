@@ -1,15 +1,15 @@
 Za pokrenuti spark ETL skripte (paziti da ste u root folderu - prakticnirad):
 python Apache\ Spark/run_scripts.py 
 
-
-za spajanje na transakcijske baze podataka:
+Nakon pokretanja svih kontejnera:
+za spajanje na transakcijske baze podataka u novom terminalu:
 docker exec -it postgres_1 psql -U postgres -d transakcije
 docker exec -it postgres_3 psql -U postgres -d skladiste
 
-za spajanje na skladiste:
+za spajanje na skladiste u novom terminalu:
 docker exec -it postgres_2 psql -U postgres -d warehouse
 
-za pregled dostupnih tablica u terminalu napišite:
+za pregled dostupnih tablica nakon spajanje na bazu ili skladište u terminalu napišite:
 \dt
 
 za pregled informacija o poojedinoj tablici u terminalu napišite:
