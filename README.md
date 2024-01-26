@@ -11,6 +11,11 @@ Nakon kloniranja ili preuzimanja zip datoteke, potrebno je prebaciti se u termin
 cd ./PrakticniRad
 ```
 
+Prije pokretanja kontejnera, potrebno je lokalno instalirati psycopg2-binary paket kako bi se moglo pokrenuti ETL skripte:
+```
+pip install psycopg2-binary
+```
+
 Zatim je potrebno pokrenuti naredbu:
 ```
 docker-compose up --build
