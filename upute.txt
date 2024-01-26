@@ -1,4 +1,76 @@
+Za pokrenuti spark ETL skripte (paziti da ste u root folderu - prakticnirad):
 python Apache\ Spark/run_scripts.py 
+
+
+za spajanje na transakcijske baze podataka:
+docker exec -it postgres_1 psql -U postgres -d transakcije
+docker exec -it postgres_3 psql -U postgres -d skladiste
+
+za spajanje na skladiste:
+docker exec -it postgres_2 psql -U postgres -d warehouse
+
+za pregled dostupnih tablica u terminalu napišite:
+\dt
+
+za pregled informacija o poojedinoj tablici u terminalu napišite:
+\d+ naziv_tablice
+
+kada se spojite na warehouse, možete isprobati sljedeće upite:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 docker exec -it 11303d0511d7 spark-submit   --master local[*]   --driver-class-path /app/postgresql-42.7.1.jar  /app/'Apache Spark'/spark_session.py
 
@@ -7,15 +79,72 @@ docker exec -it 53a1f8d43309 spark-submit   --master local[*]   --driver-class-p
 docker exec -it 53a1f8d43309 spark-submit   --master local[*]   --driver-class-path /app/postgresql-42.7.1.jar  /app/'Apache Spark'/spark_vrijeme.py
 docker exec -it 53a1f8d43309 spark-submit   --master local[*]   --driver-class-path /app/postgresql-42.7.1.jar  /app/'Apache Spark'/spark_transakcije.py
 
-docker exec -it postgres_1 psql -U postgres -d transakcije
 
-docker exec -it postgres_2 psql -U postgres -d warehouse
 
-docker exec -it postgres_3 psql -U postgres -d skladiste
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 SELECT constraint_name, constraint_type
 FROM information_schema.table_constraints
 WHERE table_name = 'Proizvodi';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
