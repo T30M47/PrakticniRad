@@ -17,7 +17,62 @@ za pregled informacija o poojedinoj tablici u terminalu napišite:
 
 kada se spojite na warehouse, možete isprobati sljedeće upite:
 
+ispis prosječne količine i iznosa prodanih proizvoda po trgovinama u 3. mjesecu svih godina:
+SELECT
+    t.id_trgovine,
+    tr.naziv_trgovine AS store_name,
+    ROUND(AVG(t.kolicina), 2) AS avg_quantity_sold,
+    ROUND(AVG(t.ukupna_cijena::numeric), 2) AS avg_price
+FROM
+    transakcije t
+JOIN
+    trgovine tr ON t.id_trgovine = tr.id_trgovine
+JOIN
+    vrijeme v ON t.id_vrijeme = v.id_vrijeme
+WHERE
+    v.month = 3
+GROUP BY
+    t.id_trgovine, store_name;
 
+prikaz ukupne količine i ukupnog iznosa transakcija po mjesecima
+
+SELECT
+    v.month,
+    ROUND(SUM(t.kolicina),2) AS total_amount_sold,
+    ROUND(SUM(t.ukupna_cijena::numeric), 2) as total_amount
+FROM                                    
+    transakcije t
+JOIN             
+    vrijeme v ON t.id_vrijeme = v.id_vrijeme
+GROUP BY                                    
+    v.month
+ORDER BY
+    v.month;
+
+
+prikaz najčešće prodavaniih proizvoda po trgovinama u 2022. godini
+
+SELECT
+    p.barkod_id,
+    p.naziv_proizvoda,
+    ROUND(SUM(t.kolicina), 2) AS total_quantity_sold,
+    tr.naziv_trgovine,
+    tr.lokacija,
+    v.year
+FROM
+    transakcije t
+JOIN 
+    trgovine tr ON t.id_trgovine = tr.id_trgovine
+JOIN 
+    vrijeme v ON t.id_vrijeme = v.id_vrijeme
+JOIN
+    proizvodi p ON t.barkod_id = p.barkod_id
+WHERE
+    v.year = 2022
+GROUP BY
+    p.barkod_id, p.naziv_proizvoda, v.year, tr.naziv_trgovine, tr.lokacija
+ORDER BY
+    total_quantity_sold DESC, v.year;
 
 
 
