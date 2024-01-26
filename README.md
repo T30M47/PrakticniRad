@@ -16,7 +16,14 @@ Zatim je potrebno pokrenuti naredbu:
 docker-compose up --build
 ```
 
-Nakon što se sve pokrene, u novom terminalu je potrebno pokrenuti Python skriptu za izvođenje ETL procesa:
+Nakon što se sve pokrene, u novom terminalu je potrebno pokrenuti Python skriptu za izvođenje ETL procesa i pokretanje Dash web aplikacije (pazite da ste i dalje u korijenskom direktoriju gdje se nalazi i Dockerfile):
 ```
 python '.\Apache Spark\run_scripts.py'
 ```
+
+Pokretanje ETL skripti i web aplikacije mogu potrajati dosta dugo, a nakon što ste sve pokrenuli, web aplikacija postaje dostupna na poveznici:
+```
+http://localhost:8050
+```
+
+Ako želite isprobati dodatne upite nad skladištem, upute su dane u datoteci upute.txt.
