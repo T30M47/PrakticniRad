@@ -38,19 +38,19 @@ prikaz ukupne količine i ukupnog iznosa transakcija po mjesecima
 
 SELECT
     v.month,
-    ROUND(SUM(t.kolicina),2) AS total_amount_sold,
-    ROUND(SUM(t.ukupna_cijena::numeric), 2) as total_amount
-FROM                                    
+    ROUND(SUM(t.kolicina), 2) AS total_amount_sold,
+    ROUND(SUM(REPLACE(t.ukupna_cijena, ',', '')::numeric), 2) AS total_amount
+FROM
     transakcije t
-JOIN             
+JOIN
     vrijeme v ON t.id_vrijeme = v.id_vrijeme
-GROUP BY                                    
+GROUP BY
     v.month
 ORDER BY
     v.month;
 
 
-prikaz najčešće prodavaniih proizvoda po trgovinama u 2022. godini
+prikaz najčešće prodavanih proizvoda po trgovinama u 2022. godini
 
 SELECT
     p.barkod_id,
